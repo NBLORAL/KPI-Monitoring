@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KPI Monitoring System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { box-sizing: border-box; }
+    * { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, .font-display { font-family: 'Space Grotesk', sans-serif; }
+    
+    .dark { --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-tertiary: #334155; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --border: #475569; --accent: #3b82f6; --accent-hover: #2563eb; }
+    .light { --bg-primary: #f8fafc; --bg-secondary: #ffffff; --bg-tertiary: #e2e8f0; --text-primary: #0f172a; --text-secondary: #64748b; --border: #cbd5e1; --accent: #3b82f6; --accent-hover: #2563eb; }
+    
+    .theme-bg-primary { background-color: var(--bg-primary); }
+    .theme-bg-secondary { background-color: var(--bg-secondary); }
+    .theme-bg-tertiary { background-color: var(--bg-tertiary); }
+    .theme-text-primary { color: var(--text-primary); }
+    .theme-text-secondary { color: var(--text-secondary); }
+    .theme-border { border-color: var(--border); }
+    
+    .card { transition: all 0.3s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.3); }
+    
+    .progress-bar { transition: width 0.5s ease; }
+    
+    .modal-overlay { animation: fadeIn 0.2s ease; }
+    .modal-content { animation: slideUp 0.3s ease; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    
+    input, select, textarea { transition: all 0.2s ease; }
+    input:focus, select:focus, textarea:focus { outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+  </style>
+</head>
+<body class="h-full light">
+  <div id="app" class="h-full w-full flex theme-bg-primary overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 theme-bg-secondary border-r theme-border flex flex-col h-full overflow-auto">
+      <div class="p-6 border-b theme-border sticky top-0">
+        <h1 id="app-title" class="font-display text-xl font-bold theme-text-primary">KPI Monitor</h1>
+        <p id="company-name" class="text-sm theme-text-secondary mt-1">Your Company</p>
+      </div>
+      
+      <nav class="flex-1 p-4 space-y-2">
+        <button onclick="navigateTo('dashboard')" class="nav-item w-full text-left px-4 py-3 rounded-lg theme-text-primary bg-blue-500/20 border border-blue-500/50" data-page="dashboard">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          Dashboard
+        </button>
+        <button onclick="navigateTo('kpi-update')" class="nav-item w-full text-left px-4 py-3 rounded-lg theme-text-secondary hover:theme-text-primary" data-page="kpi-update">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          Update KPI
+        </button>
+        <button onclick="navigateTo('management')" class="nav-item w-full text-left px-4 py-3 rounded-lg theme-text-secondary hover:theme-text-primary" data-page="management">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+          </svg>
+          Management
+        </button>
+      </nav>
+      
+      <div class="p-4 border-t theme-border">
+        <button onclick="toggleTheme()" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg theme-bg-tertiary theme-text-primary hover:opacity-80">
+          <span id="theme-text">🌙 Dark Mode</span>
+        </button>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto h-full">
+      <!-- Dashboard Page -->
+      <div id="page-dashboard" class="page p-8 max-w-7xl mx-auto">
+        <h2 class="font-display text-3xl font-bold theme-text-primary mb-2">Dashboard</h2>
+        <p class="theme-text-secondary mb-8">Monitor KPI performance across team members</p>
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="card theme-bg-secondary rounded-2xl border theme-border p-6">
+            <p class="theme-text-secondary text-sm">👥 Total Members</p>
+            <p id="stat-members" class="text-4xl font-bold theme-text-primary mt-2">0</p>
+          </div>
+          <div class="card theme-bg-secondary rounded-2xl border theme-border p-6">
+            <p class="theme-text-secondary text-sm">📊 Active KPIs</p>
+            <p id="stat-kpis" class="text-4xl font-bold theme-text-primary mt-2">0</p>
+          </div>
+          <div class="card theme-bg-secondary rounded-2xl border theme-border p-6">
+            <p class="theme-text-secondary text-sm">🎯 Total Assignments</p>
+            <p id="stat-assignments" class="text-4xl font-bold theme-text-primary mt-2">0</p>
+          </div>
+        </div>
+        
+        <!-- Leaderboard -->
+        <div class="theme-bg-secondary rounded-2xl border theme-border p-6">
+          <h3 class="font-display text-xl font-semibold theme-text-primary mb-4">🏆 Leaderboard</h3>
+          <div id="leaderboard" class="space-y-3">
+            <p class="text-center py-12 theme-text-secondary">No data yet</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- KPI Update Page -->
+      <div id="page-kpi-update" class="page p-8 max-w-7xl mx-auto hidden">
+        <h2 class="font-display text-3xl font-bold theme-text-primary mb-2">Update KPI</h2>
+        <p class="theme-text-secondary mb-8">Track progress on assigned KPIs</p>
+        
+        <div class="mb-6">
+          <label class="block text-sm font-medium theme-text-primary mb-2">Select Member</label>
+          <select id="member-select" onchange="loadMemberKpis()" class="w-full px-4 py-3 rounded-xl theme-bg-secondary border theme-border">
+            <option value="">Choose member...</option>
+          </select>
+        </div>
+        
+        <div id="kpi-update-list" class="space-y-4">
+          <p class="text-center py-12 theme-text-secondary">Select a member to view their KPIs</p>
+        </div>
+      </div>
+      
+      <!-- Management Page -->
+      <div id="page-management" class="page p-8 max-w-7xl mx-auto hidden">
+        <h2 class="font-display text-3xl font-bold theme-text-primary mb-8">Management</h2>
+        
+        <!-- Tabs -->
+        <div class="flex gap-4 mb-8 border-b theme-border">
+          <button onclick="switchTab('members')" class="tab-btn active px-6 py-3 font-semibold theme-text-primary border-b-2 border-blue-500">Members</button>
+          <button onclick="switchTab('kpis')" class="tab-btn px-6 py-3 font-semibold theme-text-secondary border-b-2 border-transparent hover:theme-text-primary">KPIs</button>
+          <button onclick="switchTab('assignments')" class="tab-btn px-6 py-3 font-semibold theme-text-secondary border-b-2 border-transparent hover:theme-text-primary">Assignments</button>
+        </div>
+        
+        <!-- Members Tab -->
+        <div id="tab-members" class="tab-content">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold theme-text-primary">Team Members</h3>
+            <button onclick="openMemberModal()" class="px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600">+ Add Member</button>
+          </div>
+          <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <p class="text-center py-12 theme-text-secondary col-span-full">No members yet</p>
+          </div>
+        </div>
+        
+        <!-- KPIs Tab -->
+        <div id="tab-kpis" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold theme-text-primary">KPI Templates</h3>
+            <button onclick="openKpiModal()" class="px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600">+ Add KPI</button>
+          </div>
+          <div id="kpis-list" class="space-y-4">
+            <p class="text-center py-12 theme-text-secondary">No KPIs yet</p>
+          </div>
+        </div>
+        
+        <!-- Assignments Tab -->
+        <div id="tab-assignments" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold theme-text-primary">KPI Assignments</h3>
+            <button onclick="openAssignmentModal()" class="px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600">+ Assign KPI</button>
+          </div>
+          <div id="assignments-list" class="space-y-4">
+            <p class="text-center py-12 theme-text-secondary">No assignments yet</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Member Modal -->
+  <div id="member-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg theme-bg-secondary rounded-2xl border theme-border p-8 max-h-[90%] overflow-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h3 id="member-modal-title" class="text-2xl font-bold theme-text-primary">Add Member</h3>
+        <button onclick="closeModal()" class="theme-text-secondary hover:theme-text-primary">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="member-form" class="space-y-4" onsubmit="saveMember(event)">
+        <input type="hidden" id="member-id">
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Nama</label>
+          <input type="text" id="member-name" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500" placeholder="John Doe">
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Nama Bisnis</label>
+          <input type="text" id="member-business" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500" placeholder="PT. Maju Jaya">
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Email</label>
+          <input type="email" id="member-email" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500" placeholder="john@example.com">
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">No HP</label>
+          <input type="tel" id="member-phone" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500" placeholder="+62812345678">
+        </div>
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 rounded-xl theme-bg-tertiary hover:opacity-80">Cancel</button>
+          <button type="submit" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- KPI Modal -->
+  <div id="kpi-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg theme-bg-secondary rounded-2xl border theme-border p-8 max-h-[90%] overflow-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h3 id="kpi-modal-title" class="text-2xl font-bold theme-text-primary">Add KPI</h3>
+        <button onclick="closeModal()" class="theme-text-secondary hover:theme-text-primary">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="kpi-form" class="space-y-4" onsubmit="saveKpi(event)">
+        <input type="hidden" id="kpi-id">
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Item</label>
+          <input type="text" id="kpi-item" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500" placeholder="e.g., Attend Meeting">
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Kriteria</label>
+          <input type="text" id="kpi-kriteria" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500" placeholder="e.g., 1 jam/week">
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Interval</label>
+          <select id="kpi-interval" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500">
+            <option value="Daily">Daily</option>
+            <option value="Weekly">Weekly</option>
+            <option value="Monthly">Monthly</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Annual">Annual</option>
+          </select>
+        </div>
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 rounded-xl theme-bg-tertiary hover:opacity-80">Cancel</button>
+          <button type="submit" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Assignment Modal -->
+  <div id="assignment-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg theme-bg-secondary rounded-2xl border theme-border p-8 max-h-[90%] overflow-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold theme-text-primary">Assign KPI</h3>
+        <button onclick="closeModal()" class="theme-text-secondary hover:theme-text-primary">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="assignment-form" class="space-y-4" onsubmit="saveAssignment(event)">
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Member</label>
+          <select id="assignment-member" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500">
+            <option value="">Choose member...</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">KPI Template</label>
+          <select id="assignment-kpi" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500">
+            <option value="">Choose KPI...</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium theme-text-primary mb-2">Target Points</label>
+          <input type="number" id="assignment-target" min="1" max="100" value="20" required class="w-full px-4 py-3 rounded-xl theme-bg-tertiary border theme-border focus:border-blue-500">
+        </div>
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 rounded-xl theme-bg-tertiary hover:opacity-80">Cancel</button>
+          <button type="submit" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600">Assign</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <script>
+    // Supabase Config
+    const SUPABASE_URL = 'https://wxzuwqwkqezbeoehizck.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4enV3cXdrcWV6YmVvZWhpemNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1MDA4NTcsImV4cCI6MjA4MTA3Njg1N30.hc69-2zHx5DwgXfzZc5Aji0_jPEHRNlKBC1a46f82zw';
+    let supabaseClient = null;
+    
+    // Initialize Supabase when ready
+    if (window.supabase) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+    
+    // State
+    let members = [];
+    let kpis = [];
+    let assignments = [];
+    let isDarkMode = false;
+    
+    const defaultConfig = { app_title: 'KPI Monitor', company_name: 'Your Company' };
+    
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: (config) => {
+          document.getElementById('app-title').textContent = config.app_title || 'KPI Monitor';
+          document.getElementById('company-name').textContent = config.company_name || 'Your Company';
+        },
+        mapToCapabilities: () => ({ recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined }),
+        mapToEditPanelValues: (config) => new Map([
+          ['app_title', config.app_title || 'KPI Monitor'],
+          ['company_name', config.company_name || 'Your Company']
+        ])
+      });
+    }
+    
+    // Fetch Data
+    async function loadData() {
+      try {
+        if (!supabaseClient) {
+          showToast('Database not initialized', 'error');
+          return;
+        }
+        
+        const [membersRes, kpisRes, assignmentsRes] = await Promise.all([
+          supabaseClient.from('members').select('*'),
+          supabaseClient.from('kpi_templates').select('*'),
+          supabaseClient.from('assignments').select('*')
+        ]);
+        
+        members = membersRes.data || [];
+        kpis = kpisRes.data || [];
+        assignments = assignmentsRes.data || [];
+        
+        renderAll();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading data', 'error');
+      }
+    }
+    
+    // Navigation
+    function navigateTo(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById(`page-${page}`).classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('bg-blue-500/20', 'border-blue-500/50', 'theme-text-primary');
+        item.classList.add('theme-text-secondary');
+      });
+      
+      const activeNav = document.querySelector(`[data-page="${page}"]`);
+      if (activeNav) {
+        activeNav.classList.add('bg-blue-500/20', 'border-blue-500/50', 'theme-text-primary');
+        activeNav.classList.remove('theme-text-secondary');
+      }
+    }
+    
+    // Tab Switching
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('theme-text-primary', 'border-blue-500');
+        btn.classList.add('theme-text-secondary', 'border-transparent');
+      });
+      
+      event.target.classList.add('theme-text-primary', 'border-blue-500');
+      event.target.classList.remove('theme-text-secondary', 'border-transparent');
+    }
+    
+    // Theme Toggle
+    function toggleTheme() {
+      isDarkMode = !isDarkMode;
+      document.body.classList.toggle('dark', isDarkMode);
+      document.body.classList.toggle('light', !isDarkMode);
+      document.getElementById('theme-text').textContent = isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+    
+    // Modal Functions
+    function openMemberModal() {
+      document.getElementById('member-id').value = '';
+      document.getElementById('member-form').reset();
+      document.getElementById('member-modal-title').textContent = 'Add Member';
+      document.getElementById('member-modal').classList.remove('hidden');
+    }
+    
+    function openKpiModal() {
+      document.getElementById('kpi-id').value = '';
+      document.getElementById('kpi-form').reset();
+      document.getElementById('kpi-modal-title').textContent = 'Add KPI';
+      document.getElementById('kpi-modal').classList.remove('hidden');
+    }
+    
+    function openAssignmentModal() {
+      document.getElementById('assignment-form').reset();
+      
+      const memberSelect = document.getElementById('assignment-member');
+      const kpiSelect = document.getElementById('assignment-kpi');
+      
+      memberSelect.innerHTML = '<option value="">Choose member...</option>';
+      kpiSelect.innerHTML = '<option value="">Choose KPI...</option>';
+      
+      members.forEach(m => memberSelect.innerHTML += `<option value="${m.id}">${m.name}</option>`);
+      kpis.forEach(k => kpiSelect.innerHTML += `<option value="${k.id}">${k.item}</option>`);
+      
+      document.getElementById('assignment-modal').classList.remove('hidden');
+    }
+    
+    function closeModal() {
+      document.querySelectorAll('[id*="-modal"]').forEach(m => m.classList.add('hidden'));
+    }
+    
+    // Save Functions
+    async function saveMember(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        showToast('Database not initialized', 'error');
+        return;
+      }
+      
+      const id = document.getElementById('member-id').value;
+      const data = {
+        name: document.getElementById('member-name').value,
+        business_name: document.getElementById('member-business').value,
+        email: document.getElementById('member-email').value,
+        phone: document.getElementById('member-phone').value
+      };
+      
+      try {
+        if (id) {
+          await supabaseClient.from('members').update(data).eq('id', id);
+          showToast('Member updated', 'success');
+        } else {
+          await supabaseClient.from('members').insert([data]);
+          showToast('Member added', 'success');
+        }
+        await loadData();
+        closeModal();
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
+    }
+    
+    async function saveKpi(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        showToast('Database not initialized', 'error');
+        return;
+      }
+      
+      const id = document.getElementById('kpi-id').value;
+      const data = {
+        item: document.getElementById('kpi-item').value,
+        kriteria: document.getElementById('kpi-kriteria').value,
+        interval: document.getElementById('kpi-interval').value
+      };
+      
+      try {
+        if (id) {
+          await supabaseClient.from('kpi_templates').update(data).eq('id', id);
+          showToast('KPI updated', 'success');
+        } else {
+          await supabaseClient.from('kpi_templates').insert([data]);
+          showToast('KPI created', 'success');
+        }
+        await loadData();
+        closeModal();
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
+    }
+    
+    async function saveAssignment(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        showToast('Database not initialized', 'error');
+        return;
+      }
+      
+      const data = {
+        member_id: document.getElementById('assignment-member').value,
+        kpi_id: document.getElementById('assignment-kpi').value,
+        target: parseInt(document.getElementById('assignment-target').value),
+        current: 0,
+        points: 0
+      };
+      
+      try {
+        await supabaseClient.from('assignments').insert([data]);
+        showToast('KPI assigned', 'success');
+        await loadData();
+        closeModal();
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
+    }
+    
+    // Delete Functions
+    async function deleteMember(id) {
+      if (confirm('Delete this member and all assignments?')) {
+        try {
+          await supabaseClient.from('assignments').delete().eq('member_id', id);
+          await supabaseClient.from('members').delete().eq('id', id);
+          showToast('Member deleted', 'success');
+          await loadData();
+        } catch (error) {
+          showToast('Error: ' + error.message, 'error');
+        }
+      }
+    }
+    
+    async function deleteKpi(id) {
+      if (confirm('Delete this KPI? Assignments will also be removed.')) {
+        try {
+          await supabaseClient.from('assignments').delete().eq('kpi_id', id);
+          await supabaseClient.from('kpi_templates').delete().eq('id', id);
+          showToast('KPI deleted', 'success');
+          await loadData();
+        } catch (error) {
+          showToast('Error: ' + error.message, 'error');
+        }
+      }
+    }
+    
+    async function deleteAssignment(id) {
+      if (confirm('Remove this assignment?')) {
+        try {
+          await supabaseClient.from('assignments').delete().eq('id', id);
+          showToast('Assignment removed', 'success');
+          await loadData();
+        } catch (error) {
+          showToast('Error: ' + error.message, 'error');
+        }
+      }
+    }
+    
+    // Load Member KPIs for Update
+    function loadMemberKpis() {
+      const memberId = document.getElementById('member-select').value;
+      const list = document.getElementById('kpi-update-list');
+      
+      if (!memberId) {
+        list.innerHTML = '<p class="text-center py-12 theme-text-secondary">Select a member to view their KPIs</p>';
+        return;
+      }
+      
+      const memberAssignments = assignments.filter(a => a.member_id === memberId);
+      
+      if (memberAssignments.length === 0) {
+        list.innerHTML = '<p class="text-center py-12 theme-text-secondary">No KPI assignments for this member</p>';
+        return;
+      }
+      
+      list.innerHTML = memberAssignments.map(a => {
+        const kpi = kpis.find(k => k.id === a.kpi_id);
+        if (!kpi) return '';
+        
+        return `
+          <div class="card theme-bg-secondary rounded-2xl border theme-border p-6">
+            <h4 class="font-semibold theme-text-primary mb-4">${kpi.item}</h4>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+              <div>
+                <p class="text-xs theme-text-secondary">Kriteria</p>
+                <p class="font-semibold theme-text-primary">${kpi.kriteria}</p>
+              </div>
+              <div>
+                <p class="text-xs theme-text-secondary">Interval</p>
+                <p class="font-semibold theme-text-primary">${kpi.interval}</p>
+              </div>
+              <div>
+                <p class="text-xs theme-text-secondary">Target</p>
+                <p class="font-semibold theme-text-primary">${a.target} pts</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-sm font-medium theme-text-primary">Achievement</label>
+                <input type="number" id="current-${a.id}" min="0" max="${a.target}" value="${a.current || 0}" class="w-full px-3 py-2 rounded-lg theme-bg-tertiary border theme-border mt-1">
+              </div>
+              <div>
+                <label class="text-sm font-medium theme-text-primary">Points</label>
+                <input type="number" id="points-${a.id}" min="0" max="${a.target}" value="${a.points || 0}" class="w-full px-3 py-2 rounded-lg theme-bg-tertiary border theme-border mt-1">
+              </div>
+            </div>
+            <button onclick="updateKpiProgress('${a.id}')" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save Update</button>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    async function updateKpiProgress(assignmentId) {
+      if (!supabaseClient) {
+        showToast('Database not initialized', 'error');
+        return;
+      }
+      
+      const current = parseInt(document.getElementById(`current-${assignmentId}`).value);
+      const points = parseInt(document.getElementById(`points-${assignmentId}`).value);
+      
+      try {
+        await supabaseClient.from('assignments').update({ current, points }).eq('id', assignmentId);
+        showToast('Progress updated', 'success');
+        await loadData();
+        loadMemberKpis();
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
+    }
+    
+    // Toast
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+      
+      toast.className = `toast ${bgColor} text-white px-6 py-3 rounded-xl shadow-lg`;
+      toast.innerHTML = `${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'} ${msg}`;
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // Render Functions
+    function renderAll() {
+      renderDashboard();
+      renderMembers();
+      renderKpis();
+      renderAssignments();
+      updateMemberSelects();
+    }
+    
+    function renderDashboard() {
+      document.getElementById('stat-members').textContent = members.length;
+      document.getElementById('stat-kpis').textContent = kpis.length;
+      document.getElementById('stat-assignments').textContent = assignments.length;
+      
+      const leaderboard = document.getElementById('leaderboard');
+      if (members.length === 0) {
+        leaderboard.innerHTML = '<p class="text-center py-12 theme-text-secondary">No data yet</p>';
+        return;
+      }
+      
+      const memberPoints = members.map(m => ({
+        member: m,
+        points: assignments.filter(a => a.member_id === m.id).reduce((sum, a) => sum + (a.points || 0), 0)
+      })).sort((a, b) => b.points - a.points);
+      
+      leaderboard.innerHTML = memberPoints.map((item, i) => `
+        <div class="flex items-center justify-between p-4 rounded-xl theme-bg-tertiary">
+          <div class="flex items-center gap-4">
+            <span class="text-xl">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
+            <div>
+              <p class="font-semibold theme-text-primary">${item.member.name}</p>
+              <p class="text-sm theme-text-secondary">${item.member.business_name}</p>
+            </div>
+          </div>
+          <p class="text-2xl font-bold theme-text-primary">${item.points}/100</p>
+        </div>
+      `).join('');
+    }
+    
+    function renderMembers() {
+      const list = document.getElementById('members-list');
+      if (members.length === 0) {
+        list.innerHTML = '<p class="col-span-full text-center py-12 theme-text-secondary">No members yet</p>';
+        return;
+      }
+      
+      list.innerHTML = members.map(m => {
+        const memberAssignments = assignments.filter(a => a.member_id === m.id);
+        const totalPoints = memberAssignments.reduce((sum, a) => sum + (a.points || 0), 0);
+        
+        return `
+          <div class="card theme-bg-secondary rounded-2xl border theme-border p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h4 class="font-semibold theme-text-primary text-lg">${m.name}</h4>
+                <p class="text-sm theme-text-secondary">${m.business_name}</p>
+                <p class="text-xs theme-text-secondary mt-1">${m.email} • ${m.phone}</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="p-2 rounded-lg hover:bg-blue-500/20 text-blue-500">✏️</button>
+                <button onclick="deleteMember('${m.id}')" class="p-2 rounded-lg hover:bg-red-500/20 text-red-500">🗑️</button>
+              </div>
+            </div>
+            <div class="flex justify-between text-sm mb-2">
+              <span class="theme-text-secondary">Points</span>
+              <span class="font-bold">${totalPoints}/100</span>
+            </div>
+            <div class="h-2 rounded-full theme-bg-tertiary overflow-hidden">
+              <div class="progress-bar h-full rounded-full bg-blue-500" style="width: ${Math.min((totalPoints / 100) * 100, 100)}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderKpis() {
+      const list = document.getElementById('kpis-list');
+      if (kpis.length === 0) {
+        list.innerHTML = '<p class="text-center py-12 theme-text-secondary">No KPIs yet</p>';
+        return;
+      }
+      
+      list.innerHTML = kpis.map(k => `
+        <div class="card theme-bg-secondary rounded-2xl border theme-border p-6 flex justify-between items-start">
+          <div>
+            <h4 class="font-semibold theme-text-primary">${k.item}</h4>
+            <p class="text-sm theme-text-secondary mt-1">${k.kriteria} • ${k.interval}</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="p-2 rounded-lg hover:bg-blue-500/20 text-blue-500">✏️</button>
+            <button onclick="deleteKpi('${k.id}')" class="p-2 rounded-lg hover:bg-red-500/20 text-red-500">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function renderAssignments() {
+      const list = document.getElementById('assignments-list');
+      if (assignments.length === 0) {
+        list.innerHTML = '<p class="text-center py-12 theme-text-secondary">No assignments yet</p>';
+        return;
+      }
+      
+      list.innerHTML = assignments.map(a => {
+        const m = members.find(x => x.id === a.member_id);
+        const k = kpis.find(x => x.id === a.kpi_id);
+        if (!m || !k) return '';
+        
+        return `
+          <div class="card theme-bg-secondary rounded-2xl border theme-border p-6">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <p class="font-semibold theme-text-primary">${m.name}</p>
+                <p class="text-sm theme-text-secondary">${k.item}</p>
+              </div>
+              <button onclick="deleteAssignment('${a.id}')" class="p-2 rounded-lg hover:bg-red-500/20 text-red-500">🗑️</button>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="theme-text-secondary">Points</span>
+              <span class="font-bold">${a.points || 0}/${a.target}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function updateMemberSelects() {
+      const select = document.getElementById('member-select');
+      select.innerHTML = '<option value="">Choose member...</option>';
+      members.forEach(m => select.innerHTML += `<option value="${m.id}">${m.name}</option>`);
+    }
+    
+    // Initialize
+    loadData();
+  </script>
+</body>
+</html>
