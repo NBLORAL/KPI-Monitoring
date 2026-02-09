@@ -620,6 +620,33 @@
       `).join('');
     }
     
+    function editMember(id) {
+      const member = members.find(m => m.id === id);
+      if (!member) return;
+      
+      document.getElementById('member-id').value = member.id;
+      document.getElementById('member-name').value = member.name;
+      document.getElementById('member-business').value = member.business_name;
+      document.getElementById('member-email').value = member.email;
+      document.getElementById('member-phone').value = member.phone;
+      document.getElementById('member-linkedin').value = member.linkedin || '';
+      document.getElementById('member-instagram').value = member.instagram || '';
+      document.getElementById('member-modal-title').textContent = 'Edit Member';
+      document.getElementById('member-modal').classList.remove('hidden');
+    }
+    
+    function editKpi(id) {
+      const kpi = kpis.find(k => k.id === id);
+      if (!kpi) return;
+      
+      document.getElementById('kpi-id').value = kpi.id;
+      document.getElementById('kpi-item').value = kpi.item;
+      document.getElementById('kpi-kriteria').value = kpi.kriteria;
+      document.getElementById('kpi-interval').value = kpi.interval;
+      document.getElementById('kpi-modal-title').textContent = 'Edit KPI';
+      document.getElementById('kpi-modal').classList.remove('hidden');
+    }
+    
     function renderMembers() {
       const list = document.getElementById('members-list');
       if (members.length === 0) {
@@ -644,7 +671,7 @@
                 </div>
               </div>
               <div class="flex gap-2">
-                <button class="p-2 rounded-lg hover:bg-blue-500/20 text-blue-500">✏️</button>
+                <button onclick="editMember('${m.id}')" class="p-2 rounded-lg hover:bg-blue-500/20 text-blue-500">✏️</button>
                 <button onclick="deleteMember('${m.id}')" class="p-2 rounded-lg hover:bg-red-500/20 text-red-500">🗑️</button>
               </div>
             </div>
@@ -674,7 +701,7 @@
             <p class="text-sm theme-text-secondary mt-1">${k.kriteria} • ${k.interval}</p>
           </div>
           <div class="flex gap-2">
-            <button class="p-2 rounded-lg hover:bg-blue-500/20 text-blue-500">✏️</button>
+            <button onclick="editKpi('${k.id}')" class="p-2 rounded-lg hover:bg-blue-500/20 text-blue-500">✏️</button>
             <button onclick="deleteKpi('${k.id}')" class="p-2 rounded-lg hover:bg-red-500/20 text-red-500">🗑️</button>
           </div>
         </div>
@@ -730,5 +757,5 @@
       initSupabase();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cb1adbb60328359',t:'MTc3MDYyMjQwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cb1c413877ae783',t:'MTc3MDYyMzMyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
