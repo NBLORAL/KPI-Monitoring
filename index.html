@@ -254,9 +254,9 @@
     </div>
    </main>
   </div><!-- Member Modal -->
-  <div id="member-modal" class="fixed inset-0 z-50 hidden">
+  <div id="member-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
    <div class="modal-overlay absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
-   <div class="modal-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] sm:w-full max-w-lg card rounded-2xl border p-4 lg:p-8 max-h-[90vh] overflow-auto">
+   <div class="modal-content relative w-[95%] sm:w-full max-w-lg card rounded-2xl border p-4 lg:p-8 max-h-[90vh] overflow-auto">
     <div class="flex justify-between items-center mb-4 lg:mb-6">
      <h3 id="member-modal-title" class="text-xl lg:text-2xl font-bold">Add Member</h3><button onclick="closeModal()" style="color: var(--text-secondary);" class="hover:opacity-80 flex-shrink-0">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -281,9 +281,9 @@
     </form>
    </div>
   </div><!-- KPI Modal -->
-  <div id="kpi-modal" class="fixed inset-0 z-50 hidden">
+  <div id="kpi-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
    <div class="modal-overlay absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
-   <div class="modal-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] sm:w-full max-w-lg card rounded-2xl border p-4 lg:p-8 max-h-[90vh] overflow-auto">
+   <div class="modal-content relative w-[95%] sm:w-full max-w-lg card rounded-2xl border p-4 lg:p-8 max-h-[90vh] overflow-auto">
     <div class="flex justify-between items-center mb-4 lg:mb-6">
      <h3 id="kpi-modal-title" class="text-xl lg:text-2xl font-bold">Add KPI</h3><button onclick="closeModal()" style="color: var(--text-secondary);" class="hover:opacity-80 flex-shrink-0">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -302,9 +302,9 @@
     </form>
    </div>
   </div><!-- Assignment Modal -->
-  <div id="assignment-modal" class="fixed inset-0 z-50 hidden">
+  <div id="assignment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
    <div class="modal-overlay absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
-   <div class="modal-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] sm:w-full max-w-lg card rounded-2xl border p-4 lg:p-8 max-h-[90vh] overflow-auto">
+   <div class="modal-content relative w-[95%] sm:w-full max-w-lg card rounded-2xl border p-4 lg:p-8 max-h-[90vh] overflow-auto">
     <div class="flex justify-between items-center mb-4 lg:mb-6">
      <h3 class="text-xl lg:text-2xl font-bold">Assign KPI</h3><button onclick="closeModal()" style="color: var(--text-secondary);" class="hover:opacity-80 flex-shrink-0">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -621,52 +621,78 @@
       }
     }
 
-    // Delete Functions
-    async function deleteMember(id) {
-      const confirmed = confirm('Delete this member and all assignments?');
-      if (!confirmed || !supabaseClient) return;
+    // Delete Functions with inline confirmation
+    let deleteConfirmation = { type: null, id: null };
+
+    function showDeleteConfirm(type, id, message) {
+      deleteConfirmation = { type, id };
       
-      try {
-        await supabaseClient.from('assignments').delete().eq('member_id', id);
-        const result = await supabaseClient.from('members').delete().eq('id', id);
-        if (result.error) throw result.error;
-        
-        showToast('Member deleted ✓', 'success');
-        await loadData();
-      } catch (error) {
-        showToast('Error: ' + error.message, 'error');
-      }
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      toast.className = 'fixed bottom-4 right-4 z-50 bg-red-600 text-white px-6 py-4 rounded-xl shadow-lg max-w-sm';
+      toast.innerHTML = `
+        <p class="mb-3 text-sm">${message}</p>
+        <div class="flex gap-2">
+          <button onclick="cancelDelete()" class="flex-1 px-3 py-2 bg-red-700 rounded hover:bg-red-800 text-sm font-medium">Cancel</button>
+          <button onclick="confirmDelete('${type}', '${id}')" class="flex-1 px-3 py-2 bg-white text-red-600 rounded hover:bg-gray-100 text-sm font-medium">Delete</button>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      toast.id = 'delete-confirm-toast';
     }
 
-    async function deleteKpi(id) {
-      const confirmed = confirm('Delete this KPI? Assignments will also be removed.');
-      if (!confirmed || !supabaseClient) return;
-      
-      try {
-        await supabaseClient.from('assignments').delete().eq('kpi_id', id);
-        const result = await supabaseClient.from('kpi_templates').delete().eq('id', id);
-        if (result.error) throw result.error;
-        
-        showToast('KPI deleted ✓', 'success');
-        await loadData();
-      } catch (error) {
-        showToast('Error: ' + error.message, 'error');
-      }
+    function cancelDelete() {
+      const toast = document.getElementById('delete-confirm-toast');
+      if (toast) toast.remove();
+      deleteConfirmation = { type: null, id: null };
     }
 
-    async function deleteAssignment(id) {
-      const confirmed = confirm('Remove this assignment?');
-      if (!confirmed || !supabaseClient) return;
-      
+    async function confirmDelete(type, id) {
+      if (!supabaseClient) {
+        showToast('Database not initialized', 'error');
+        return;
+      }
+
+      const toast = document.getElementById('delete-confirm-toast');
+      if (toast) toast.remove();
+
       try {
-        const result = await supabaseClient.from('assignments').delete().eq('id', id);
-        if (result.error) throw result.error;
+        if (type === 'member') {
+          await supabaseClient.from('assignments').delete().eq('member_id', id);
+          const result = await supabaseClient.from('members').delete().eq('id', id);
+          if (result.error) throw result.error;
+          showToast('Member deleted ✓', 'success');
+        } else if (type === 'kpi') {
+          await supabaseClient.from('assignments').delete().eq('kpi_id', id);
+          const result = await supabaseClient.from('kpi_templates').delete().eq('id', id);
+          if (result.error) throw result.error;
+          showToast('KPI deleted ✓', 'success');
+        } else if (type === 'assignment') {
+          const result = await supabaseClient.from('assignments').delete().eq('id', id);
+          if (result.error) throw result.error;
+          showToast('Assignment removed ✓', 'success');
+        }
         
-        showToast('Assignment removed ✓', 'success');
         await loadData();
       } catch (error) {
         showToast('Error: ' + error.message, 'error');
       }
+
+      deleteConfirmation = { type: null, id: null };
+    }
+
+    function deleteMember(id) {
+      showDeleteConfirm('member', id, '🗑️ Delete this member and all their assignments?');
+    }
+
+    function deleteKpi(id) {
+      showDeleteConfirm('kpi', id, '🗑️ Delete this KPI? All assignments will also be removed.');
+    }
+
+    function deleteAssignment(id) {
+      showDeleteConfirm('assignment', id, '🗑️ Remove this assignment?');
     }
 
     // KPI Update
@@ -788,13 +814,16 @@
 
     function editMember(id) {
       const member = members.find(m => m.id === id);
-      if (!member) return;
+      if (!member) {
+        showToast('Member not found', 'error');
+        return;
+      }
       
-      document.getElementById('member-id').value = member.id;
-      document.getElementById('member-name').value = member.name;
-      document.getElementById('member-business').value = member.business_name;
-      document.getElementById('member-email').value = member.email;
-      document.getElementById('member-phone').value = member.phone;
+      document.getElementById('member-id').value = member.id || '';
+      document.getElementById('member-name').value = member.name || '';
+      document.getElementById('member-business').value = member.business_name || '';
+      document.getElementById('member-email').value = member.email || '';
+      document.getElementById('member-phone').value = member.phone || '';
       document.getElementById('member-linkedin').value = member.linkedin || '';
       document.getElementById('member-instagram').value = member.instagram || '';
       document.getElementById('member-modal-title').textContent = 'Edit Member';
@@ -803,12 +832,15 @@
 
     function editKpi(id) {
       const kpi = kpis.find(k => k.id === id);
-      if (!kpi) return;
+      if (!kpi) {
+        showToast('KPI not found', 'error');
+        return;
+      }
       
-      document.getElementById('kpi-id').value = kpi.id;
-      document.getElementById('kpi-item').value = kpi.item;
-      document.getElementById('kpi-kriteria').value = kpi.kriteria;
-      document.getElementById('kpi-interval').value = kpi.interval;
+      document.getElementById('kpi-id').value = kpi.id || '';
+      document.getElementById('kpi-item').value = kpi.item || '';
+      document.getElementById('kpi-kriteria').value = kpi.kriteria || '';
+      document.getElementById('kpi-interval').value = kpi.interval || '';
       document.getElementById('kpi-modal-title').textContent = 'Edit KPI';
       document.getElementById('kpi-modal').classList.remove('hidden');
     }
@@ -935,5 +967,5 @@
       initSupabase();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cb992fb87d744b7',t:'MTc3MDcwNTE5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cb99af3537344b7',t:'MTc3MDcwNTUyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
