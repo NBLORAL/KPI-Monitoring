@@ -168,7 +168,7 @@
      <h1 id="app-title" class="font-display text-lg lg:text-xl font-bold whitespace-nowrap">KPI Monitor</h1>
      <p id="company-name" class="text-xs lg:text-sm mt-1 whitespace-nowrap" style="color: var(--text-secondary);">Your Company</p>
     </div>
-    <nav class="flex lg:flex-col flex-1 lg:flex-none gap-1 lg:gap-0 p-1 lg:p-4 lg:space-y-2 overflow-x-auto lg:overflow-x-visible"><button onclick="navigateTo('dashboard')" class="nav-item flex-shrink-0 lg:w-full text-center lg:text-left px-1.5 lg:px-4 py-1.5 lg:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex flex-col lg:flex-row items-center lg:items-center gap-0.5 lg:gap-3 justify-center lg:justify-start text-xs lg:text-base" data-page="dashboard" style="background-color: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5);"> <span>📊</span> <span>Dashboard</span> </button> <button onclick="navigateTo('kpi-update')" class="nav-item flex-shrink-0 lg:w-full text-center lg:text-left px-1.5 lg:px-4 py-1.5 lg:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex flex-col lg:flex-row items-center lg:items-center gap-0.5 lg:gap-3 justify-center lg:justify-start text-xs lg:text-base" data-page="kpi-update" style="color: var(--text-secondary);"> <span>⚡</span> <span>Update KPI</span> </button> <button onclick="navigateTo('management')" class="nav-item flex-shrink-0 lg:w-full text-center lg:text-left px-1.5 lg:px-4 py-1.5 lg:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex flex-col lg:flex-row items-center lg:items-center gap-0.5 lg:gap-3 justify-center lg:justify-start text-xs lg:text-base" data-page="management" style="color: var(--text-secondary);"> <span>⚙️</span> <span>Management</span> </button>
+    <nav class="flex lg:flex-col flex-1 lg:flex-none gap-1 lg:gap-0 p-1 lg:p-4 lg:space-y-2 overflow-x-auto lg:overflow-x-visible"><button onclick="navigateTo('dashboard')" class="nav-item flex-shrink-0 lg:w-full text-center lg:text-left px-1.5 lg:px-4 py-1.5 lg:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex flex-col lg:flex-row items-center lg:items-center gap-0.5 lg:gap-3 justify-center lg:justify-start text-xs lg:text-base" data-page="dashboard" style="background-color: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5);"> <span>📊</span> <span>Dashboard</span> </button> <button onclick="navigateTo('kpi-update')" class="nav-item flex-shrink-0 lg:w-full text-center lg:text-left px-1.5 lg:px-4 py-1.5 lg:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex flex-col lg:flex-row items-center lg:items-center gap-0.5 lg:gap-3 justify-center lg:justify-start text-xs lg:text-base" data-page="kpi-update" style="color: var(--text-secondary);"> <span>⚡</span> <span>Update KPI</span> </button> <button onclick="navigateTo('management')" class="nav-item flex-shrink-0 lg:w-full text-center lg:text-left px-1.5 lg:px-4 py-1.5 lg:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex flex-col lg:flex-row items-center lg:items-center gap-0.5 lg:gap-3 justify-center lg:justify-start text-xs lg:text-base" data-page="management" style="color: var(--text-secondary);"> <span>��️</span> <span>Management</span> </button>
     </nav>
     <div class="p-2 lg:p-4 border-l lg:border-l-0 lg:border-t flex-shrink-0" style="border-color: var(--border);"><button onclick="toggleTheme()" class="w-full flex items-center justify-center gap-1 lg:gap-2 px-3 lg:px-4 py-2 rounded-lg font-medium text-xs lg:text-base transition-all" style="background-color: var(--bg-tertiary);"> <span id="theme-icon">🌙</span> <span id="theme-text" class="hidden lg:inline">Dark Mode</span> </button>
     </div>
@@ -178,6 +178,19 @@
      <div class="mb-6 lg:mb-8">
       <h2 class="font-display text-2xl lg:text-3xl font-bold mb-2">Dashboard</h2>
       <p style="color: var(--text-secondary);" class="text-sm lg:text-base">Monitor KPI performance across team members</p>
+     </div><!-- Date Filter -->
+     <div class="card rounded-2xl border p-4 lg:p-6 mb-6 lg:mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 lg:gap-4 items-end">
+       <div><label class="block text-xs lg:text-sm font-medium mb-2">Start Date</label> <input type="date" id="filter-start-date" onchange="updateDashboardFilter()" class="w-full px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base">
+       </div>
+       <div><label class="block text-xs lg:text-sm font-medium mb-2">End Date</label> <input type="date" id="filter-end-date" onchange="updateDashboardFilter()" class="w-full px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base">
+       </div>
+       <div class="flex gap-2 lg:gap-3"><button onclick="setFilterRange('week')" class="flex-1 px-3 lg:px-4 py-2 lg:py-3 rounded-xl border hover:opacity-80 text-xs lg:text-sm font-medium transition-all">This Week</button> <button onclick="setFilterRange('month')" class="flex-1 px-3 lg:px-4 py-2 lg:py-3 rounded-xl border hover:opacity-80 text-xs lg:text-sm font-medium transition-all">This Month</button>
+       </div>
+       <div class="flex gap-2 lg:gap-3"><button onclick="goToPreviousWeek()" class="flex-1 px-3 lg:px-4 py-2 lg:py-3 rounded-xl border hover:opacity-80 text-xs lg:text-sm font-medium transition-all" style="background-color: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.5);">⬅️ Prev Week</button> <button onclick="goToPreviousMonth()" class="flex-1 px-3 lg:px-4 py-2 lg:py-3 rounded-xl border hover:opacity-80 text-xs lg:text-sm font-medium transition-all" style="background-color: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.5);">⬅️ Prev Month</button>
+       </div>
+      </div>
+      <p id="filter-display" class="text-xs mt-3" style="color: var(--text-secondary);">All time</p>
      </div><!-- Loading State -->
      <div id="dashboard-loading" class="hidden">
       <div class="flex items-center justify-center py-12">
@@ -187,7 +200,7 @@
      <div id="dashboard-content" class="hidden">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
        <div class="card rounded-2xl border p-4 lg:p-6">
-        <p style="color: var(--text-secondary);" class="text-xs lg:text-sm">👥 Total Members</p>
+        <p style="color: var(--text-secondary);" class="text-xs lg:text-sm">��� Total Members</p>
         <p id="stat-members" class="text-3xl lg:text-4xl font-bold mt-2">0</p>
        </div>
        <div class="card rounded-2xl border p-4 lg:p-6">
@@ -200,7 +213,7 @@
        </div>
       </div><!-- Leaderboard -->
       <div class="card rounded-2xl border p-4 lg:p-6">
-       <h3 class="font-display text-lg lg:text-xl font-semibold mb-4 lg:mb-6">🏆 Leaderboard</h3>
+       <h3 class="font-display text-lg lg:text-xl font-semibold mb-4 lg:mb-6">��� Leaderboard</h3>
        <div id="leaderboard" class="space-y-2 lg:space-y-3">
         <p class="text-center py-12 text-sm lg:text-base" style="color: var(--text-secondary);">No data yet</p>
        </div>
@@ -208,7 +221,7 @@
      </div><!-- Error State -->
      <div id="dashboard-error" class="hidden">
       <div class="card rounded-2xl border p-6 lg:p-8 text-center">
-       <p style="color: var(--error);" class="text-base lg:text-lg">⚠️ Failed to load dashboard</p><button onclick="loadData()" class="btn-primary mt-4 px-4 lg:px-6 py-2 rounded-lg text-sm lg:text-base">Retry</button>
+       <p style="color: var(--error);" class="text-base lg:text-lg">���️ Failed to load dashboard</p><button onclick="loadData()" class="btn-primary mt-4 px-4 lg:px-6 py-2 rounded-lg text-sm lg:text-base">Retry</button>
       </div>
      </div>
     </div><!-- KPI Update Page -->
@@ -217,10 +230,19 @@
       <h2 class="font-display text-2xl lg:text-3xl font-bold mb-2">Update KPI</h2>
       <p style="color: var(--text-secondary);" class="text-sm lg:text-base">Track progress on assigned KPIs</p>
      </div>
-     <div class="mb-6 max-w-md"><label class="block text-sm font-medium mb-2">Select Member</label> <select id="member-select" onchange="loadMemberKpis()" class="w-full px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base"> <option value="">Choose member...</option> </select>
+     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 mb-6">
+      <div><label class="block text-sm font-medium mb-2">Select Member</label> <select id="member-select" onchange="loadMemberKpis()" class="w-full px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base"> <option value="">Choose member...</option> </select>
+      </div>
+      <div><label class="block text-sm font-medium mb-2">Select Date</label> <input type="date" id="completion-date" class="w-full px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base" onchange="updateDateDisplay()">
+      </div>
+     </div>
+     <div id="date-display" class="mb-6 p-3 lg:p-4 rounded-xl" style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);">
+      <p class="text-xs lg:text-sm font-medium">📅 Selected Date: <span id="date-text" style="color: var(--text-secondary);">Choose a date</span></p>
      </div>
      <div id="kpi-update-list" class="space-y-3 lg:space-y-4">
-      <p class="text-center py-12 text-sm lg:text-base" style="color: var(--text-secondary);">Select a member to view their KPIs</p>
+      <p class="text-center py-12 text-sm lg:text-base" style="color: var(--text-secondary);">Select a member and date to view their KPIs</p>
+     </div>
+     <div id="kpi-submit-section" class="hidden mt-8 flex justify-end gap-3"><button onclick="resetKpiUpdate()" class="px-6 py-3 rounded-xl border hover:opacity-80 font-medium text-sm lg:text-base">Cancel</button> <button onclick="submitKpiUpdates()" class="btn-primary px-6 py-3 rounded-xl font-medium text-sm lg:text-base">Submit Checklist</button>
      </div>
     </div><!-- Management Page -->
     <div id="page-management" class="page p-4 lg:p-8 max-w-7xl mx-auto w-full">
@@ -314,9 +336,12 @@
     <form id="assignment-form" class="space-y-3 lg:space-y-4" onsubmit="saveAssignment(event)">
      <div><label class="block text-xs lg:text-sm font-medium mb-1 lg:mb-2">Member</label> <select id="assignment-member" required class="w-full px-3 lg:px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base"> <option value="">Choose member...</option> </select>
      </div>
-     <div><label class="block text-xs lg:text-sm font-medium mb-1 lg:mb-2">KPI Template</label> <select id="assignment-kpi" required class="w-full px-3 lg:px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base"> <option value="">Choose KPI...</option> </select>
+     <div><label class="block text-xs lg:text-sm font-medium mb-1 lg:mb-2">Select KPIs</label>
+      <div id="kpi-checklist" class="space-y-2 max-h-64 overflow-y-auto">
+       <p class="text-xs text-center py-4" style="color: var(--text-secondary);">Loading KPIs...</p>
+      </div>
      </div>
-     <div><label class="block text-xs lg:text-sm font-medium mb-1 lg:mb-2">Target Points</label> <input type="number" id="assignment-target" min="1" max="100" value="20" required class="w-full px-3 lg:px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base">
+     <div><label class="block text-xs lg:text-sm font-medium mb-1 lg:mb-2">Target Points per KPI</label> <input type="number" id="assignment-target" min="1" max="100" value="20" required class="w-full px-3 lg:px-4 py-2 lg:py-3 rounded-xl border text-sm lg:text-base">
      </div>
      <div class="flex gap-2 lg:gap-3 pt-2 lg:pt-4"><button type="button" onclick="closeModal()" class="flex-1 px-3 lg:px-6 py-2 lg:py-3 rounded-xl border hover:opacity-80 text-sm lg:text-base">Cancel</button> <button type="submit" class="flex-1 btn-primary px-3 lg:px-6 py-2 lg:py-3 rounded-xl font-medium text-sm lg:text-base">Assign</button>
      </div>
@@ -333,7 +358,9 @@
     let members = [];
     let kpis = [];
     let assignments = [];
+    let completions = [];
     let isDarkMode = false;
+    let dashboardFilter = { startDate: null, endDate: null };
 
     // Initialize Element SDK
     if (window.elementSdk) {
@@ -394,25 +421,49 @@
       try {
         showDashboardLoading();
         
-        const [membersRes, kpisRes, assignmentsRes] = await Promise.all([
-          supabaseClient.from('members').select('*'),
-          supabaseClient.from('kpi_templates').select('*'),
-          supabaseClient.from('assignments').select('*')
-        ]);
+        // Load each table separately with better error handling
+        try {
+          const membersRes = await supabaseClient.from('members').select('*');
+          members = membersRes.data || [];
+          if (membersRes.error) console.warn('Members table warning:', membersRes.error);
+        } catch (e) {
+          console.warn('Members load warning:', e);
+          members = [];
+        }
         
-        if (membersRes.error) throw membersRes.error;
-        if (kpisRes.error) throw kpisRes.error;
-        if (assignmentsRes.error) throw assignmentsRes.error;
+        try {
+          const kpisRes = await supabaseClient.from('kpi_templates').select('*');
+          kpis = kpisRes.data || [];
+          if (kpisRes.error) console.warn('KPIs table warning:', kpisRes.error);
+        } catch (e) {
+          console.warn('KPIs load warning:', e);
+          kpis = [];
+        }
         
-        members = membersRes.data || [];
-        kpis = kpisRes.data || [];
-        assignments = assignmentsRes.data || [];
+        try {
+          const assignmentsRes = await supabaseClient.from('assignments').select('*');
+          assignments = assignmentsRes.data || [];
+          if (assignmentsRes.error) console.warn('Assignments table warning:', assignmentsRes.error);
+        } catch (e) {
+          console.warn('Assignments load warning:', e);
+          assignments = [];
+        }
+        
+        try {
+          const completionsRes = await supabaseClient.from('completions').select('*');
+          completions = completionsRes.data || [];
+          if (completionsRes.error) console.warn('Completions table warning:', completionsRes.error);
+        } catch (e) {
+          console.warn('Completions load warning:', e);
+          completions = [];
+        }
         
         renderAll();
         showDashboardContent();
+        showToast('✓ Data loaded successfully', 'success');
       } catch (error) {
         console.error('Error loading data:', error);
-        showToast('Error loading data', 'error');
+        showToast('Error loading data: ' + error.message, 'error');
         showDashboardError();
       }
     }
@@ -477,6 +528,87 @@
       document.getElementById('theme-text').textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
     }
 
+    // Dashboard Filter
+    function setFilterRange(range) {
+      const today = new Date();
+      let startDate, endDate;
+
+      if (range === 'week') {
+        const dayOfWeek = today.getDay();
+        const diff = today.getDate() - dayOfWeek;
+        startDate = new Date(today.setDate(diff));
+        endDate = new Date();
+      } else if (range === 'month') {
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        endDate = new Date();
+      }
+
+      document.getElementById('filter-start-date').value = startDate.toISOString().split('T')[0];
+      document.getElementById('filter-end-date').value = endDate.toISOString().split('T')[0];
+      updateDashboardFilter();
+    }
+
+    function goToPreviousWeek() {
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      
+      // Get current week start
+      const currentWeekStart = new Date(today);
+      currentWeekStart.setDate(today.getDate() - dayOfWeek);
+      
+      // Go back 7 days to get previous week
+      const prevWeekEnd = new Date(currentWeekStart);
+      prevWeekEnd.setDate(prevWeekEnd.getDate() - 1);
+      
+      const prevWeekStart = new Date(prevWeekEnd);
+      prevWeekStart.setDate(prevWeekEnd.getDate() - 6);
+      
+      document.getElementById('filter-start-date').value = prevWeekStart.toISOString().split('T')[0];
+      document.getElementById('filter-end-date').value = prevWeekEnd.toISOString().split('T')[0];
+      updateDashboardFilter();
+    }
+
+    function goToPreviousMonth() {
+      const today = new Date();
+      
+      // Get first day of previous month
+      const prevMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      
+      // Get last day of previous month
+      const prevMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+      
+      document.getElementById('filter-start-date').value = prevMonthStart.toISOString().split('T')[0];
+      document.getElementById('filter-end-date').value = prevMonthEnd.toISOString().split('T')[0];
+      updateDashboardFilter();
+    }
+
+    function updateDashboardFilter() {
+      const startInput = document.getElementById('filter-start-date').value;
+      const endInput = document.getElementById('filter-end-date').value;
+
+      dashboardFilter.startDate = startInput ? new Date(startInput + 'T00:00:00') : null;
+      dashboardFilter.endDate = endInput ? new Date(endInput + 'T23:59:59') : null;
+
+      const filterDisplay = document.getElementById('filter-display');
+      if (startInput && endInput) {
+        const start = new Date(startInput).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        const end = new Date(endInput).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        filterDisplay.textContent = `📅 ${start} to ${end}`;
+      } else if (startInput) {
+        const start = new Date(startInput).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        filterDisplay.textContent = `📅 From ${start}`;
+      } else if (endInput) {
+        const end = new Date(endInput).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        filterDisplay.textContent = `📅 Until ${end}`;
+      } else {
+        filterDisplay.textContent = 'All time';
+      }
+
+      renderDashboard();
+    }
+
+    // Theme Toggle
+
     // Modals
     function openMemberModal() {
       document.getElementById('member-id').value = '';
@@ -494,6 +626,48 @@
 
     function openAssignmentModal() {
       document.getElementById('assignment-form').reset();
+      document.getElementById('assignment-form').dataset.mode = 'add';
+      document.getElementById('assignment-form').dataset.id = '';
+      
+      const memberSelect = document.getElementById('assignment-member');
+      memberSelect.innerHTML = '<option value="">Choose member...</option>';
+      members.forEach(m => memberSelect.innerHTML += `<option value="${m.id}">${m.name}</option>`);
+      memberSelect.disabled = false;
+      
+      // Generate KPI checklist
+      const kpiChecklist = document.getElementById('kpi-checklist');
+      if (kpiChecklist) {
+        kpiChecklist.innerHTML = kpis.map(k => `
+          <label class="flex items-center gap-3 p-3 rounded-lg hover:opacity-80 cursor-pointer" style="background-color: var(--bg-tertiary);">
+            <input type="checkbox" name="kpi-checkbox" value="${k.id}" class="w-4 h-4">
+            <div>
+              <p class="font-medium text-sm">${k.item}</p>
+              <p class="text-xs" style="color: var(--text-secondary);">${k.kriteria} • ${k.interval}</p>
+            </div>
+          </label>
+        `).join('');
+      }
+      
+      document.getElementById('assignment-modal').classList.remove('hidden');
+    }
+
+    function editAssignment(id) {
+      const assignment = assignments.find(a => a.id === id);
+      if (!assignment) {
+        showToast('Assignment not found', 'error');
+        return;
+      }
+      
+      const m = members.find(x => x.id === assignment.member_id);
+      const k = kpis.find(x => x.id === assignment.kpi_id);
+      
+      if (!m || !k) {
+        showToast('Member or KPI not found', 'error');
+        return;
+      }
+      
+      document.getElementById('assignment-form').dataset.mode = 'edit';
+      document.getElementById('assignment-form').dataset.id = id;
       
       const memberSelect = document.getElementById('assignment-member');
       const kpiSelect = document.getElementById('assignment-kpi');
@@ -501,8 +675,15 @@
       memberSelect.innerHTML = '<option value="">Choose member...</option>';
       kpiSelect.innerHTML = '<option value="">Choose KPI...</option>';
       
-      members.forEach(m => memberSelect.innerHTML += `<option value="${m.id}">${m.name}</option>`);
-      kpis.forEach(k => kpiSelect.innerHTML += `<option value="${k.id}">${k.item}</option>`);
+      members.forEach(mem => memberSelect.innerHTML += `<option value="${mem.id}">${mem.name}</option>`);
+      kpis.forEach(kpi => kpiSelect.innerHTML += `<option value="${kpi.id}">${kpi.item}</option>`);
+      
+      memberSelect.value = assignment.member_id;
+      kpiSelect.value = assignment.kpi_id;
+      document.getElementById('assignment-target').value = assignment.target;
+      
+      memberSelect.disabled = true;
+      kpiSelect.disabled = true;
       
       document.getElementById('assignment-modal').classList.remove('hidden');
     }
@@ -567,7 +748,7 @@
       };
       
       try {
-        const btn = event.target.querySelector('button[type="submit"]');
+        const btn = e.target.querySelector('button[type="submit"]');
         btn.disabled = true;
         
         if (id) {
@@ -584,8 +765,9 @@
         closeModal();
       } catch (error) {
         showToast('Error: ' + error.message, 'error');
+        console.error('Save KPI error:', error);
       } finally {
-        event.target.querySelector('button[type="submit"]').disabled = false;
+        e.target.querySelector('button[type="submit"]').disabled = false;
       }
     }
 
@@ -596,28 +778,43 @@
         return;
       }
       
-      const data = {
-        member_id: document.getElementById('assignment-member').value,
-        kpi_id: document.getElementById('assignment-kpi').value,
-        target: parseInt(document.getElementById('assignment-target').value),
-        current: 0,
-        points: 0
-      };
+      const memberId = document.getElementById('assignment-member').value;
+      const targetPoints = parseInt(document.getElementById('assignment-target').value);
+      const checkedKpis = Array.from(document.querySelectorAll('input[name="kpi-checkbox"]:checked')).map(cb => cb.value);
+      
+      if (!memberId) {
+        showToast('Please select a member', 'error');
+        return;
+      }
+      
+      if (checkedKpis.length === 0) {
+        showToast('Please select at least one KPI', 'error');
+        return;
+      }
       
       try {
-        const btn = event.target.querySelector('button[type="submit"]');
+        const btn = e.target.querySelector('button[type="submit"]');
         btn.disabled = true;
         
-        const result = await supabaseClient.from('assignments').insert([data]);
+        // Create assignment for each selected KPI
+        const assignmentsToCreate = checkedKpis.map(kpiId => ({
+          member_id: memberId,
+          kpi_id: kpiId,
+          target: targetPoints,
+          current: 0,
+          points: 0
+        }));
+        
+        const result = await supabaseClient.from('assignments').insert(assignmentsToCreate);
         if (result.error) throw result.error;
         
-        showToast('KPI assigned ✓', 'success');
+        showToast(`✓ ${checkedKpis.length} KPI assigned to member`, 'success');
         await loadData();
         closeModal();
       } catch (error) {
         showToast('Error: ' + error.message, 'error');
       } finally {
-        event.target.querySelector('button[type="submit"]').disabled = false;
+        e.target.querySelector('button[type="submit"]').disabled = false;
       }
     }
 
@@ -695,79 +892,215 @@
       showDeleteConfirm('assignment', id, '🗑️ Remove this assignment?');
     }
 
+    // Helper: Get week number of year
+    function getWeekNumber(date) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    // Helper: Get year-week key
+    function getYearWeekKey(date) {
+      return `${date.getFullYear()}-W${getWeekNumber(date)}`;
+    }
+
     // KPI Update
     function loadMemberKpis() {
       const memberId = document.getElementById('member-select').value;
+      const selectedDate = document.getElementById('completion-date').value;
       const list = document.getElementById('kpi-update-list');
+      const submitSection = document.getElementById('kpi-submit-section');
       
-      if (!memberId) {
-        list.innerHTML = '<p class="text-center py-12" style="color: var(--text-secondary);">Select a member to view their KPIs</p>';
+      if (!memberId || !selectedDate) {
+        list.innerHTML = '<p class="text-center py-12" style="color: var(--text-secondary);">Select a member and date to view their KPIs</p>';
+        submitSection.classList.add('hidden');
         return;
       }
+      
+      const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+      const currentWeekKey = getYearWeekKey(selectedDateObj);
       
       const memberAssignments = assignments.filter(a => a.member_id === memberId);
       
       if (memberAssignments.length === 0) {
         list.innerHTML = '<p class="text-center py-12" style="color: var(--text-secondary);">No KPI assignments for this member</p>';
+        submitSection.classList.add('hidden');
         return;
       }
       
-      list.innerHTML = memberAssignments.map(a => {
+      // Filter assignments: hanya tampilkan yang belum diceklis di minggu ini
+      const kpisThisWeek = memberAssignments.map(a => {
+        const lastCheckedWeek = a.last_checked_week || null;
+        const isCheckedThisWeek = lastCheckedWeek === currentWeekKey;
+        
+        return {
+          ...a,
+          isCheckedThisWeek,
+          isCompleted: isCheckedThisWeek
+        };
+      }).filter(a => !a.isCompleted); // Hanya tampilkan yang belum diceklis minggu ini
+      
+      if (kpisThisWeek.length === 0) {
+        list.innerHTML = '<p class="text-center py-12" style="color: var(--text-secondary);">✅ All KPIs completed for this member this week!</p>';
+        submitSection.classList.add('hidden');
+        return;
+      }
+      
+      list.innerHTML = kpisThisWeek.map(a => {
         const kpi = kpis.find(k => k.id === a.kpi_id);
         if (!kpi) return '';
         
         return `
           <div class="card rounded-2xl border p-4 lg:p-6">
-            <h4 class="font-semibold mb-3 lg:mb-4 text-sm lg:text-base">${kpi.item}</h4>
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-4 mb-3 lg:mb-4">
-              <div>
-                <p class="text-xs" style="color: var(--text-secondary);">Kriteria</p>
-                <p class="font-semibold text-xs lg:text-sm">${kpi.kriteria}</p>
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <h4 class="font-semibold mb-2 lg:mb-3 text-sm lg:text-base">${kpi.item}</h4>
+                <div class="grid grid-cols-2 gap-2 lg:gap-4 mb-3 lg:mb-4">
+                  <div>
+                    <p class="text-xs" style="color: var(--text-secondary);">Kriteria</p>
+                    <p class="font-semibold text-xs lg:text-sm">${kpi.kriteria}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs" style="color: var(--text-secondary);">Interval</p>
+                    <p class="font-semibold text-xs lg:text-sm">${kpi.interval}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs" style="color: var(--text-secondary);">Target</p>
+                    <p class="font-semibold text-xs lg:text-sm">${a.target} pts</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p class="text-xs" style="color: var(--text-secondary);">Interval</p>
-                <p class="font-semibold text-xs lg:text-sm">${kpi.interval}</p>
-              </div>
-              <div>
-                <p class="text-xs" style="color: var(--text-secondary);">Target</p>
-                <p class="font-semibold text-xs lg:text-sm">${a.target} pts</p>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-2 lg:gap-4 mb-3 lg:mb-4">
-              <div>
-                <label class="text-xs lg:text-sm font-medium">Achievement</label>
-                <input type="number" id="current-${a.id}" min="0" max="${a.target}" value="${a.current || 0}" class="w-full px-2 lg:px-3 py-1 lg:py-2 rounded-lg border mt-1 text-xs lg:text-base">
-              </div>
-              <div>
-                <label class="text-xs lg:text-sm font-medium">Points</label>
-                <input type="number" id="points-${a.id}" min="0" max="${a.target}" value="${a.points || 0}" class="w-full px-2 lg:px-3 py-1 lg:py-2 rounded-lg border mt-1 text-xs lg:text-base">
+              <div class="flex-shrink-0">
+                <input type="checkbox" id="checkbox-${a.id}" data-assignment-id="${a.id}" class="kpi-checkbox w-6 h-6 rounded-lg cursor-pointer" style="accent-color: var(--success);">
               </div>
             </div>
-            <button onclick="updateKpiProgress('${a.id}')" class="w-full btn-primary px-3 lg:px-4 py-2 rounded-lg font-medium text-xs lg:text-base">Save Update</button>
           </div>
         `;
       }).join('');
+      
+      submitSection.classList.remove('hidden');
     }
 
-    async function updateKpiProgress(assignmentId) {
+    function updateDateDisplay() {
+      const dateInput = document.getElementById('completion-date');
+      const dateText = document.getElementById('date-text');
+      
+      if (dateInput.value) {
+        const date = new Date(dateInput.value + 'T00:00:00');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = date.toLocaleDateString('id-ID', options);
+        dateText.textContent = formattedDate;
+        loadMemberKpis();
+      } else {
+        dateText.textContent = 'Choose a date';
+        document.getElementById('kpi-update-list').innerHTML = '<p class="text-center py-12" style="color: var(--text-secondary);">Select a member and date to view their KPIs</p>';
+        document.getElementById('kpi-submit-section').classList.add('hidden');
+      }
+    }
+
+    async function submitKpiUpdates() {
       if (!supabaseClient) {
         showToast('Database not initialized', 'error');
         return;
       }
-      
-      const current = parseInt(document.getElementById(`current-${assignmentId}`).value);
-      const points = parseInt(document.getElementById(`points-${assignmentId}`).value);
-      
-      try {
-        const result = await supabaseClient.from('assignments').update({ current, points }).eq('id', assignmentId);
-        if (result.error) throw result.error;
-        
-        showToast('Progress updated ✓', 'success');
-        await loadData();
-        loadMemberKpis();
-      } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+
+      const memberId = document.getElementById('member-select').value;
+      const selectedDate = document.getElementById('completion-date').value;
+      const checkedBoxes = document.querySelectorAll('.kpi-checkbox:checked');
+
+      if (!memberId || !selectedDate) {
+        showToast('Please select member and date', 'error');
+        return;
       }
+
+      if (checkedBoxes.length === 0) {
+        showToast('Pilih minimal 1 task untuk diceklis', 'error');
+        return;
+      }
+
+      try {
+        const btn = document.querySelector('#kpi-submit-section button[onclick="submitKpiUpdates()"]');
+        btn.disabled = true;
+
+        const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+        const currentWeekKey = getYearWeekKey(selectedDateObj);
+
+        // Create completion records and collect assignment IDs to update
+        const completionRecords = [];
+        const assignmentUpdates = [];
+        let successCount = 0;
+        let failCount = 0;
+
+        for (const checkbox of checkedBoxes) {
+          const assignmentId = checkbox.dataset.assignmentId;
+          const assignment = assignments.find(a => a.id === assignmentId);
+          
+          if (!assignment) {
+            console.error('Assignment not found:', assignmentId);
+            failCount++;
+            continue;
+          }
+
+          // Create completion record
+          completionRecords.push({
+            member_id: memberId,
+            assignment_id: assignmentId,
+            kpi_id: assignment.kpi_id,
+            points_earned: assignment.target,
+            completion_date: selectedDate
+          });
+
+          // Prepare assignment update: increment points and set last_checked_week
+          assignmentUpdates.push({
+            id: assignmentId,
+            newPoints: (assignment.points || 0) + assignment.target,
+            weekKey: currentWeekKey
+          });
+        }
+
+        // Save completions
+        const completionResult = await supabaseClient.from('completions').insert(completionRecords);
+
+        if (completionResult.error) {
+          console.error('Completion insert error:', completionResult.error);
+          failCount = completionRecords.length;
+        } else {
+          successCount = completionRecords.length;
+          
+          // Update assignments: add points and mark week as checked
+          for (const update of assignmentUpdates) {
+            await supabaseClient
+              .from('assignments')
+              .update({ points: update.newPoints, last_checked_week: update.weekKey })
+              .eq('id', update.id);
+          }
+        }
+
+        if (failCount > 0) {
+          showToast(`⚠️ ${successCount} saved, ${failCount} failed. Check console.`, 'error');
+        } else {
+          showToast(`✅ ${successCount} task(s) recorded! Points awarded!`, 'success');
+        }
+
+        await loadData();
+        resetKpiUpdate();
+      } catch (error) {
+        console.error('Submit error:', error);
+        showToast('Error: ' + error.message, 'error');
+      } finally {
+        const btn = document.querySelector('#kpi-submit-section button[onclick="submitKpiUpdates()"]');
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function resetKpiUpdate() {
+      document.getElementById('member-select').value = '';
+      document.getElementById('completion-date').value = '';
+      document.getElementById('date-text').textContent = 'Choose a date';
+      document.getElementById('kpi-update-list').innerHTML = '<p class="text-center py-12 text-sm lg:text-base" style="color: var(--text-secondary);">Select a member and date to view their KPIs</p>';
+      document.getElementById('kpi-submit-section').classList.add('hidden');
     }
 
     // Render Functions
@@ -793,23 +1126,49 @@
         return;
       }
       
-      const memberPoints = members.map(m => ({
-        member: m,
-        points: assignments.filter(a => a.member_id === m.id).reduce((sum, a) => sum + (a.points || 0), 0)
-      })).sort((a, b) => b.points - a.points);
+      // Filter completions based on date range
+      const filteredCompletions = completions.filter(c => {
+        // If no filter is set, include all
+        if (!dashboardFilter.startDate && !dashboardFilter.endDate) return true;
+        
+        const completionDate = new Date(c.completion_date + 'T00:00:00');
+        
+        if (dashboardFilter.startDate && completionDate < dashboardFilter.startDate) return false;
+        if (dashboardFilter.endDate && completionDate > dashboardFilter.endDate) return false;
+        
+        return true;
+      });
       
-      leaderboard.innerHTML = memberPoints.map((item, i) => `
+      // Calculate points per member from filtered completions
+      const memberPoints = members.map(m => {
+        const memberCompletions = filteredCompletions.filter(c => c.member_id === m.id);
+        // Sum points_earned directly from completion records
+        const points = memberCompletions.reduce((sum, c) => {
+          const pointsEarned = parseFloat(c.points_earned) || 0;
+          return sum + pointsEarned;
+        }, 0);
+        return { member: m, points, completionCount: memberCompletions.length };
+      }).sort((a, b) => b.points - a.points);
+      
+      if (memberPoints.every(mp => mp.points === 0)) {
+        leaderboard.innerHTML = '<p class="text-center py-12 text-sm lg:text-base" style="color: var(--text-secondary);">No completions in this period</p>';
+        return;
+      }
+      
+      leaderboard.innerHTML = memberPoints.map((item, i) => {
+        const scoreColor = item.points >= 100 ? 'var(--success)' : 'var(--accent)';
+        return `
         <div class="flex items-center justify-between p-3 lg:p-4 rounded-xl card gap-2">
           <div class="flex items-center gap-2 lg:gap-4 flex-1 min-w-0">
             <span class="text-lg lg:text-xl flex-shrink-0">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
             <div class="min-w-0">
               <p class="font-semibold text-xs lg:text-base truncate">${item.member.name}</p>
-              <p class="text-xs" style="color: var(--text-secondary); truncate;">${item.member.business_name}</p>
+              <p class="text-xs" style="color: var(--text-secondary); truncate;">${item.completionCount} completions</p>
             </div>
           </div>
-          <p class="text-xl lg:text-2xl font-bold flex-shrink-0" style="color: var(--accent);">${item.points}/100</p>
+          <p class="text-xl lg:text-2xl font-bold flex-shrink-0" style="color: ${scoreColor};">${Math.round(item.points)}</p>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     function editMember(id) {
@@ -865,8 +1224,8 @@
                 <p class="text-sm" style="color: var(--text-secondary);">${m.business_name}</p>
                 <p class="text-xs" style="color: var(--text-secondary); margin-top: 0.25rem;">${m.email} • ${m.phone}</p>
                 <div class="flex gap-2 mt-3">
-                  ${m.linkedin ? `<a href="${m.linkedin}" target="_blank" rel="noopener noreferrer" class="text-blue-600 text-xs">🔗 LinkedIn</a>` : ''}
-                  ${m.instagram ? `<a href="https://instagram.com/${m.instagram.replace('@', '')}" target="_blank" rel="noopener noreferrer" class="text-pink-600 text-xs">📸 Instagram</a>` : ''}
+                  ${m.linkedin ? `<a href="${m.linkedin}" target="_blank" rel="noopener noreferrer" class="text-blue-600 text-xs">�� LinkedIn</a>` : ''}
+                  ${m.instagram ? `<a href="https://instagram.com/${m.instagram.replace('@', '')}" target="_blank" rel="noopener noreferrer" class="text-pink-600 text-xs">���� Instagram</a>` : ''}
                 </div>
               </div>
               <div class="flex gap-2">
@@ -900,7 +1259,7 @@
             <p class="text-sm" style="color: var(--text-secondary); margin-top: 0.25rem;">${k.kriteria} • ${k.interval}</p>
           </div>
           <div class="flex gap-2">
-            <button onclick="editKpi('${k.id}')" class="p-2 rounded-lg hover:opacity-80" style="background-color: rgba(59, 130, 246, 0.2); color: var(--accent);">✏️</button>
+            <button onclick="editKpi('${k.id}')" class="p-2 rounded-lg hover:opacity-80" style="background-color: rgba(59, 130, 246, 0.2); color: var(--accent);">������</button>
             <button onclick="deleteKpi('${k.id}')" class="p-2 rounded-lg hover:opacity-80" style="background-color: rgba(239, 68, 68, 0.2); color: var(--error);">🗑️</button>
           </div>
         </div>
@@ -926,7 +1285,10 @@
                 <p class="font-semibold">${m.name}</p>
                 <p class="text-sm" style="color: var(--text-secondary);">${k.item}</p>
               </div>
-              <button onclick="deleteAssignment('${a.id}')" class="p-2 rounded-lg hover:opacity-80" style="background-color: rgba(239, 68, 68, 0.2); color: var(--error);">🗑️</button>
+              <div class="flex gap-2">
+                <button onclick="editAssignment('${a.id}')" class="p-2 rounded-lg hover:opacity-80" style="background-color: rgba(59, 130, 246, 0.2); color: var(--accent);">��️</button>
+                <button onclick="deleteAssignment('${a.id}')" class="p-2 rounded-lg hover:opacity-80" style="background-color: rgba(239, 68, 68, 0.2); color: var(--error);">🗑️</button>
+              </div>
             </div>
             <div class="flex justify-between text-sm">
               <span style="color: var(--text-secondary);">Points</span>
@@ -967,5 +1329,5 @@
       initSupabase();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cba1270b520244a',t:'MTc3MDcxMDQxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cba67a9a76303d4',t:'MTc3MDcxMzkwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
